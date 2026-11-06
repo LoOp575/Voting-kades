@@ -3,198 +3,652 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pemilihan Kepala Desa</title>
+  <title>Portal Demokrasi Desa - Pemilihan Kepala Desa 2026 - 2032</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="#" class="nav-brand" onclick="showPage('voting')">
-        🗳️ PilKades
-      </a>
-      <div class="nav-links">
-        <a href="#" class="nav-link active" data-page="voting" onclick="showPage('voting')">Voting</a>
-        <a href="#" class="nav-link" data-page="results" onclick="showPage('results')">Hasil</a>
-        <a href="#" class="nav-link" data-page="transparency" onclick="showPage('transparency')">Transparansi</a>
-      </div>
-      <button class="hamburger" onclick="toggleMenu()">☰</button>
-    </div>
-  </nav>
-
-  <!-- Voting Page -->
-  <section id="page-voting" class="page active">
-    <div class="container">
-      <div class="hero">
-        <h1>Pemilihan Kepala Desa</h1>
-        <p class="subtitle">Satu Perangkat, Satu Suara</p>
-        <p class="description">Pilih calon kepala desa terbaik untuk desa kita. Perangkat Anda hanya dapat memberikan satu suara.</p>
-      </div>
-
-      <div id="voting-area">
-        <div class="candidates-grid">
-          <!-- Kandidat 1 -->
-          <div class="candidate-card" data-candidate="1" onclick="selectCandidate(1)">
-            <div class="candidate-number" style="background: #2563eb;">1</div>
-            <div class="candidate-avatar">👤</div>
-            <h3 class="candidate-name">Calon 1</h3>
-            <div class="vision-mission">
-              <h4>Visi:</h4>
-              <p>Terwujudnya desa yang mandiri, sejahtera, dan berakhlak mulia melalui pemberdayaan masyarakat.</p>
-              <h4>Misi:</h4>
-              <ul>
-                <li>Meningkatkan kualitas infrastruktur desa</li>
-                <li>Mengembangkan potensi ekonomi lokal</li>
-                <li>Meningkatkan pelayanan publik yang transparan</li>
-                <li>Melestarikan budaya dan kearifan lokal</li>
-              </ul>
-            </div>
+  <!-- Header Banner -->
+  <header class="header-banner">
+    <div class="header-overlay"></div>
+    <div class="header-content">
+      <div class="header-top">
+        <div class="header-logo">
+          <div class="logo-emblem">
+            <i class="fas fa-mosque"></i>
           </div>
-
-          <!-- Kandidat 2 -->
-          <div class="candidate-card" data-candidate="2" onclick="selectCandidate(2)">
-            <div class="candidate-number" style="background: #16a34a;">2</div>
-            <div class="candidate-avatar">👤</div>
-            <h3 class="candidate-name">Calon 2</h3>
-            <div class="vision-mission">
-              <h4>Visi:</h4>
-              <p>Membangun desa yang inovatif dan berkelanjutan berbasis teknologi digital.</p>
-              <h4>Misi:</h4>
-              <ul>
-                <li>Digitalisasi layanan pemerintahan desa</li>
-                <li>Pelatihan teknologi untuk pemuda desa</li>
-                <li>Pengembangan wisata berbasis digital</li>
-                <li>Sistem informasi desa yang terbuka</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Kandidat 3 -->
-          <div class="candidate-card" data-candidate="3" onclick="selectCandidate(3)">
-            <div class="candidate-number" style="background: #dc2626;">3</div>
-            <div class="candidate-avatar">👤</div>
-            <h3 class="candidate-name">Calon 3</h3>
-            <div class="vision-mission">
-              <h4>Visi:</h4>
-              <p>Desa yang adil, merata, dan bermartabat dengan semangat gotong royong.</p>
-              <h4>Misi:</h4>
-              <ul>
-                <li>Pemerataan pembangunan di seluruh dusun</li>
-                <li>Penguatan lembaga kemasyarakatan</li>
-                <li>Program bantuan sosial yang tepat sasaran</li>
-                <li>Pemberdayaan perempuan dan anak</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Kandidat 4 -->
-          <div class="candidate-card" data-candidate="4" onclick="selectCandidate(4)">
-            <div class="candidate-number" style="background: #9333ea;">4</div>
-            <div class="candidate-avatar">👤</div>
-            <h3 class="candidate-name">Calon 4</h3>
-            <div class="vision-mission">
-              <h4>Visi:</h4>
-              <p>Desa hijau, lestari, dan produktif menuju ketahanan pangan lokal.</p>
-              <h4>Misi:</h4>
-              <ul>
-                <li>Program pertanian organik dan perikanan</li>
-                <li>Penghijauan dan konservasi lingkungan</li>
-                <li>Pengelolaan sampah dan energi terbarukan</li>
-                <li>Pasar desa untuk produk lokal</li>
-              </ul>
-            </div>
+          <div class="logo-text">
+            <strong>Desa Maju Jaya</strong>
+            <span>Kec. Sejahtera</span>
           </div>
         </div>
-
-        <div class="vote-button-container">
-          <button id="vote-btn" class="btn-vote" onclick="submitVote()" disabled>
-            Pilih Kandidat di Atas
-          </button>
+        <div class="header-title">
+          <h1>Portal Demokrasi Desa</h1>
+          <h2>Pemilihan Kepala Desa 2026 – 2032</h2>
+          <span class="header-tagline">Suara Warga, Masa Depan Desa</span>
         </div>
-      </div>
-
-      <div id="voted-notice" class="voted-notice" style="display: none;">
-        <div class="notice-icon">✅</div>
-        <h2>Terima Kasih!</h2>
-        <p>Suara Anda telah tercatat untuk <strong>Calon <span id="voted-candidate"></span></strong>.</p>
-        <p class="notice-sub">Perangkat ini sudah menggunakan hak suaranya.</p>
-        <button class="btn-secondary" onclick="showPage('results')">Lihat Hasil Voting</button>
+        <div class="header-voting-date">
+          <div class="voting-icon"><i class="fas fa-calendar-alt"></i></div>
+          <div class="voting-info">
+            <strong>Pemungutan Suara</strong>
+            <span>12 Desember 2026</span>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
+  </header>
 
-  <!-- Results Page -->
-  <section id="page-results" class="page">
-    <div class="container">
-      <div class="hero">
-        <h1>Hasil Perolehan Suara</h1>
-        <p class="subtitle">Real-time Count</p>
-      </div>
-
-      <div class="results-container">
-        <div class="chart-wrapper">
-          <canvas id="voteChart"></canvas>
+  <!-- Stats Bar -->
+  <section class="stats-bar">
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+          <div class="stat-number" id="stat-voters">1.248</div>
+          <div class="stat-label">Data Pemilih</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i> +2% dari bulan lalu</div>
         </div>
-        <div class="results-details" id="results-details">
-          <!-- Filled by JS -->
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-user-tie"></i></div>
+        <div class="stat-info">
+          <div class="stat-number">4</div>
+          <div class="stat-label">Calon Kepala Desa</div>
+          <div class="stat-link">Kenali Programnya <i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange"><i class="fas fa-vote-yea"></i></div>
+        <div class="stat-info">
+          <div class="stat-number" id="stat-votes">892</div>
+          <div class="stat-label">Suara Masuk</div>
+          <div class="stat-change">
+            <div class="stat-progress-bar">
+              <div class="stat-progress-fill" id="stat-progress" style="width: 71.5%"></div>
+            </div>
+            <span id="stat-participation">(71,5%)</span>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-comment-dots"></i></div>
+        <div class="stat-info">
+          <div class="stat-number" id="stat-aspirations">124</div>
+          <div class="stat-label">Aspirasi Warga</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i> +12 baru</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Transparency Page -->
-  <section id="page-transparency" class="page">
-    <div class="container">
-      <div class="hero">
-        <h1>Transparansi Sistem</h1>
-        <p class="subtitle">Kejelasan & Akuntabilitas</p>
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" data-page="beranda" onclick="showPage('beranda')">
+          <i class="fas fa-home"></i> <span>Beranda</span>
+        </a>
+        <a href="#" class="sidebar-link" data-page="kandidat" onclick="showPage('kandidat')">
+          <i class="fas fa-users"></i> <span>Kandidat</span>
+        </a>
+        <a href="#" class="sidebar-link" data-page="polling" onclick="showPage('polling')">
+          <i class="fas fa-vote-yea"></i> <span>Polling</span>
+        </a>
+        <a href="#" class="sidebar-link" data-page="aspirasi" onclick="showPage('aspirasi')">
+          <i class="fas fa-comment-alt"></i> <span>Aspirasi</span>
+        </a>
+        <a href="#" class="sidebar-link" data-page="informasi" onclick="showPage('informasi')">
+          <i class="fas fa-info-circle"></i> <span>Informasi</span>
+        </a>
+        <a href="#" class="sidebar-link" data-page="jadwal" onclick="showPage('jadwal')">
+          <i class="fas fa-calendar-alt"></i> <span>Jadwal</span>
+        </a>
+        <a href="#" class="sidebar-link" data-page="pengaturan" onclick="showPage('pengaturan')">
+          <i class="fas fa-cog"></i> <span>Pengaturan</span>
+        </a>
+      </nav>
+      <div class="verified-badge">
+        <i class="fas fa-shield-alt"></i>
+        <div>
+          <strong>Akses Terverifikasi</strong>
+          <span>Perangkat Anda sudah terdaftar ✓</span>
+        </div>
       </div>
+      <div class="sidebar-quote">
+        <em>"Bersama Membangun Desa yang Lebih Baik"</em>
+      </div>
+    </aside>
 
-      <div class="transparency-content">
-        <div class="info-card">
-          <h3>🔒 Satu Perangkat, Satu Suara</h3>
-          <p>Sistem menandai perangkat Anda dengan <strong>cookie aman</strong> + <strong>fingerprint browser</strong> (sinyal teknis ringan) yang di-hash di server. Pilihan Anda tidak dapat dilacak kembali ke identitas.</p>
-        </div>
+    <!-- Content Area -->
+    <main class="content-area">
 
-        <div class="info-card">
-          <h3>🔄 Refresh & Menutup Browser</h3>
-          <p>Refresh halaman atau menutup browser <strong>tidak membuka hak voting baru</strong>. Menghapus cookie juga tidak menghapus catatan hak pilih di server.</p>
-        </div>
+      <!-- Beranda Page -->
+      <section id="page-beranda" class="page active">
+        <!-- Profil Kandidat -->
+        <div class="content-section">
+          <div class="section-header">
+            <div>
+              <h2><i class="fas fa-users"></i> Profil Kandidat</h2>
+              <p class="section-desc">Kenali visi, misi dan program kerja mereka</p>
+            </div>
+            <a href="#" class="btn-link" onclick="showPage('kandidat')">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+          </div>
 
-        <div class="info-card">
-          <h3>📱 Berbagi Perangkat</h3>
-          <p><strong>Catatan penting:</strong> satu perangkat satu suara ≠ satu orang satu suara. Sistem membatasi perangkat, bukan mengenali individu. Warga yang berbagi HP diharapkan berbagi secara adil.</p>
-        </div>
+          <div class="candidates-row">
+            <!-- Kandidat 01 -->
+            <div class="candidate-profile-card" onclick="selectCandidate(1)">
+              <div class="candidate-photo" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                <span class="candidate-number-badge">01</span>
+                <div class="candidate-photo-placeholder"><i class="fas fa-user"></i></div>
+              </div>
+              <div class="candidate-profile-info">
+                <h3>Budi Santoso</h3>
+                <span class="candidate-field">Pembangunan & Infrastruktur</span>
+                <p class="candidate-vision">"Membangun desa maju, modern dan sejahtera."</p>
+                <button class="btn-detail" onclick="event.stopPropagation(); showPage('kandidat'); focusCandidate(1);">
+                  <i class="fas fa-eye"></i> Lihat Detail
+                </button>
+              </div>
+            </div>
 
-        <div class="info-card">
-          <h3>🛡️ Privasi Dijamin</h3>
-          <p><strong>Nama, NIK, nomor HP, dan alamat IP tidak pernah diminta atau disimpan.</strong></p>
-        </div>
+            <!-- Kandidat 02 -->
+            <div class="candidate-profile-card" onclick="selectCandidate(2)">
+              <div class="candidate-photo" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                <span class="candidate-number-badge">02</span>
+                <div class="candidate-photo-placeholder"><i class="fas fa-user"></i></div>
+              </div>
+              <div class="candidate-profile-info">
+                <h3>Siti Rahmawati</h3>
+                <span class="candidate-field">Ekonomi & UMKM</span>
+                <p class="candidate-vision">"Mewujudkan desa mandiri dan berdaya saing."</p>
+                <button class="btn-detail" onclick="event.stopPropagation(); showPage('kandidat'); focusCandidate(2);">
+                  <i class="fas fa-eye"></i> Lihat Detail
+                </button>
+              </div>
+            </div>
 
-        <div class="info-card">
-          <h3>📊 Detail Teknis</h3>
-          <div class="tech-details" id="tech-details">
-            <!-- Filled by JS -->
+            <!-- Kandidat 03 -->
+            <div class="candidate-profile-card" onclick="selectCandidate(3)">
+              <div class="candidate-photo" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <span class="candidate-number-badge">03</span>
+                <div class="candidate-photo-placeholder"><i class="fas fa-user"></i></div>
+              </div>
+              <div class="candidate-profile-info">
+                <h3>Ahmad Fauzi</h3>
+                <span class="candidate-field">Pelayanan Publik</span>
+                <p class="candidate-vision">"Pelayanan cepat, transparan dan berpihak pada rakyat."</p>
+                <button class="btn-detail" onclick="event.stopPropagation(); showPage('kandidat'); focusCandidate(3);">
+                  <i class="fas fa-eye"></i> Lihat Detail
+                </button>
+              </div>
+            </div>
+
+            <!-- Kandidat 04 -->
+            <div class="candidate-profile-card" onclick="selectCandidate(4)">
+              <div class="candidate-photo" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                <span class="candidate-number-badge">04</span>
+                <div class="candidate-photo-placeholder"><i class="fas fa-user"></i></div>
+              </div>
+              <div class="candidate-profile-info">
+                <h3>Dewi Lestari</h3>
+                <span class="candidate-field">Pendidikan & Kesehatan</span>
+                <p class="candidate-vision">"Desa cerdas, sehat dan berbudaya."</p>
+                <button class="btn-detail" onclick="event.stopPropagation(); showPage('kandidat'); focusCandidate(4);">
+                  <i class="fas fa-eye"></i> Lihat Detail
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="info-card">
-          <h3>📈 Statistik Sistem</h3>
-          <div class="stats" id="system-stats">
-            <!-- Filled by JS -->
+        <!-- Bottom Row: Tahapan + Berita + Aspirasi -->
+        <div class="bottom-grid">
+          <!-- Tahapan Pemilihan -->
+          <div class="content-section timeline-section">
+            <div class="section-header">
+              <div>
+                <h2><i class="fas fa-calendar-check"></i> Tahapan Pemilihan</h2>
+              </div>
+              <a href="#" class="btn-link" onclick="showPage('jadwal')">Lihat Jadwal Lengkap <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="timeline">
+              <div class="timeline-item completed">
+                <div class="timeline-dot"><i class="fas fa-check"></i></div>
+                <div class="timeline-content">
+                  <strong>Publikasi Calon</strong>
+                  <span>01–10 Nov</span>
+                </div>
+              </div>
+              <div class="timeline-item completed">
+                <div class="timeline-dot"><i class="fas fa-check"></i></div>
+                <div class="timeline-content">
+                  <strong>Penyerapan Aspirasi</strong>
+                  <span>11–30 Nov</span>
+                </div>
+              </div>
+              <div class="timeline-item current">
+                <div class="timeline-dot">3</div>
+                <div class="timeline-content">
+                  <strong>Debat Publik</strong>
+                  <span>05 Des</span>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot">4</div>
+                <div class="timeline-content">
+                  <strong>Pemungutan Suara</strong>
+                  <span>12 Des</span>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot">5</div>
+                <div class="timeline-content">
+                  <strong>Pengumuman Hasil</strong>
+                  <span>15 Des</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Berita & Pengumuman -->
+          <div class="content-section news-section">
+            <div class="section-header">
+              <div>
+                <h2><i class="fas fa-bullhorn"></i> Berita & Pengumuman</h2>
+              </div>
+              <a href="#" class="btn-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="news-list">
+              <div class="news-item">
+                <div class="news-thumb"><i class="fas fa-newspaper"></i></div>
+                <div class="news-content">
+                  <h4>Debat Kandidat Pilkades 2026</h4>
+                  <p>Debat kandidat akan digelar pada 5 Desember 2026.</p>
+                  <span class="news-date"><i class="fas fa-calendar"></i> 28 Nov 2026</span>
+                </div>
+              </div>
+              <div class="news-item">
+                <div class="news-thumb"><i class="fas fa-file-alt"></i></div>
+                <div class="news-content">
+                  <h4>Pengumuman DPT</h4>
+                  <p>Daftar Pemilih Tetap telah ditetapkan.</p>
+                  <span class="news-date"><i class="fas fa-calendar"></i> 25 Nov 2026</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aspirasi Warga -->
+          <div class="content-section aspiration-section">
+            <div class="section-header">
+              <div>
+                <h2><i class="fas fa-comment-dots"></i> Kritik & Saran Warga</h2>
+              </div>
+              <a href="#" class="btn-link" onclick="showPage('aspirasi')">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="aspiration-list" id="aspiration-list">
+              <div class="aspiration-item">
+                <div class="aspiration-avatar"><i class="fas fa-user"></i></div>
+                <div class="aspiration-content">
+                  <p>Mohon perbaikan jalan di dusun Sukamaju.</p>
+                  <span class="aspiration-tag saran">Saran</span>
+                  <span class="aspiration-date">29 Nov 2026</span>
+                </div>
+              </div>
+              <div class="aspiration-item">
+                <div class="aspiration-avatar"><i class="fas fa-user"></i></div>
+                <div class="aspiration-content">
+                  <p>Semoga program UMKM desa segera direalisasikan.</p>
+                  <span class="aspiration-tag kritik">Kritik</span>
+                  <span class="aspiration-date">28 Nov 2026</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn-aspirasi" onclick="showPage('aspirasi')">
+              <i class="fas fa-paper-plane"></i> Kirim Aspirasi
+            </button>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
+
+      <!-- Kandidat Page -->
+      <section id="page-kandidat" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-users"></i> Calon Kepala Desa 2026–2032</h1>
+          <p>Pilih pemimpin yang tepat untuk desa kita. Klik untuk memilih kandidat.</p>
+        </div>
+
+        <div id="voting-area">
+          <div class="candidates-grid-full">
+            <!-- Kandidat 1 -->
+            <div class="candidate-full-card" data-candidate="1" onclick="selectCandidate(1)">
+              <div class="candidate-full-photo" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                <span class="candidate-number-badge large">01</span>
+                <div class="candidate-photo-placeholder large"><i class="fas fa-user"></i></div>
+              </div>
+              <div class="candidate-full-info">
+                <h3>Budi Santoso</h3>
+                <span class="candidate-field">Pembangunan & Infrastruktur</span>
+                <div class="vision-mission-full">
+                  <h4>Visi</h4>
+                  <p>"Membangun desa maju, modern dan sejahtera."</p>
+                  <h4>Misi</h4>
+                  <ul>
+                    <li>Pembangunan jalan dan jembatan di seluruh dusun</li>
+                    <li>Penyediaan air bersih dan sanitasi</li>
+                    <li>Penerangan jalan umum berbasis energi surya</li>
+                    <li>Digitalisasi administrasi desa</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kandidat 2 -->
+            <div class="candidate-full-card" data-candidate="2" onclick="selectCandidate(2)">
+              <div class="candidate-full-photo" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                <span class="candidate-number-badge large">02</span>
+                <div class="candidate-photo-placeholder large"><i class="fas fa-user"></i></div>
+              </div>
+              <div class="candidate-full-info">
+                <h3>Siti Rahmawati</h3>
+                <span class="candidate-field">Ekonomi & UMKM</span>
+                <div class="vision-mission-full">
+                  <h4>Visi</h4>
+                  <p>"Mewujudkan desa mandiri dan berdaya saing."</p>
+                  <h4>Misi</h4>
+                  <ul>
+                    <li>Pemberdayaan UMKM dan koperasi desa</li>
+                    <li>Pelatihan keterampilan untuk pemuda</li>
+                    <li>Pengembangan pasar desa dan e-commerce</li>
+                    <li>Pendampingan pertanian modern</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kandidat 3 -->
+            <div class="candidate-full-card" data-candidate="3" onclick="selectCandidate(3)">
+              <div class="candidate-full-photo" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <span class="candidate-number-badge large">03</span>
+                <div class="candidate-photo-placeholder large"><i class="fas fa-user"></i></div>
+              </div>
+              <div class="candidate-full-info">
+                <h3>Ahmad Fauzi</h3>
+                <span class="candidate-field">Pelayanan Publik</span>
+                <div class="vision-mission-full">
+                  <h4>Visi</h4>
+                  <p>"Pelayanan cepat, transparan dan berpihak pada rakyat."</p>
+                  <h4>Misi</h4>
+                  <ul>
+                    <li>Satu pintu pelayanan administrasi</li>
+                    <li>Transparansi APBDes secara real-time</li>
+                    <li>Pengaduan warga 24 jam via aplikasi</li>
+                    <li>Program beasiswa untuk anak tidak mampu</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kandidat 4 -->
+            <div class="candidate-full-card" data-candidate="4" onclick="selectCandidate(4)">
+              <div class="candidate-full-photo" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                <span class="candidate-number-badge large">04</span>
+                <div class="candidate-photo-placeholder large"><i class="fas fa-user"></i></div>
+              </div>
+              <div class="candidate-full-info">
+                <h3>Dewi Lestari</h3>
+                <span class="candidate-field">Pendidikan & Kesehatan</span>
+                <div class="vision-mission-full">
+                  <h4>Visi</h4>
+                  <p>"Desa cerdas, sehat dan berbudaya."</p>
+                  <h4>Misi</h4>
+                  <ul>
+                    <li>Renovasi sekolah dan PAUD di tiap dusun</li>
+                    <li>Posyandu dan puskesmas pembantu 24 jam</li>
+                    <li>Melestarikan budaya dan kearifan lokal</li>
+                    <li>Program kesehatan gratis untuk lansia</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="vote-button-container">
+            <button id="vote-btn" class="btn-vote" onclick="submitVote()" disabled>
+              <i class="fas fa-check-circle"></i> Pilih Kandidat di Atas
+            </button>
+          </div>
+        </div>
+
+        <div id="voted-notice" class="voted-notice" style="display: none;">
+          <div class="voted-content">
+            <div class="voted-checkmark">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Terima Kasih!</h2>
+            <p>Suara Anda telah tercatat untuk <strong>Calon <span id="voted-candidate"></span></strong>.</p>
+            <p class="voted-sub">Perangkat ini sudah menggunakan hak suaranya. Pilihan tidak dapat diubah.</p>
+            <div class="voted-actions">
+              <button class="btn-primary" onclick="showPage('polling')">
+                <i class="fas fa-chart-pie"></i> Lihat Hasil Voting
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Polling Page -->
+      <section id="page-polling" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-chart-pie"></i> Hasil Polling Sementara</h1>
+          <p class="live-badge"><span class="live-dot"></span> Live Update</p>
+        </div>
+
+        <div class="polling-grid">
+          <div class="polling-chart-section">
+            <div class="chart-card">
+              <div class="chart-center-text">
+                <div class="chart-percent" id="chart-percent">0%</div>
+                <div class="chart-label">Partisipasi</div>
+              </div>
+              <canvas id="voteChart"></canvas>
+            </div>
+          </div>
+          <div class="polling-details-section">
+            <div id="polling-details">
+              <!-- Filled by JS -->
+            </div>
+            <div class="polling-total">
+              <div class="polling-total-value" id="polling-total-value">0</div>
+              <div class="polling-total-label">Total Suara Masuk</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Aspirasi Page -->
+      <section id="page-aspirasi" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-comment-dots"></i> Kritik & Saran Warga</h1>
+          <p>Sampaikan aspirasi Anda untuk pembangunan desa</p>
+        </div>
+
+        <div class="aspirasi-grid">
+          <div class="aspirasi-form-section">
+            <div class="form-card">
+              <h3><i class="fas fa-pen"></i> Kirim Aspirasi</h3>
+              <form id="aspirasi-form" onsubmit="submitAspirasi(event)">
+                <div class="form-group">
+                  <label>Nama (Opsional)</label>
+                  <input type="text" placeholder="Anonim" maxlength="50">
+                </div>
+                <div class="form-group">
+                  <label>Kategori</label>
+                  <select id="aspirasi-category">
+                    <option value="saran">💡 Saran</option>
+                    <option value="kritik">⚠️ Kritik</option>
+                    <option value="dukungan">👍 Dukungan</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Pesan</label>
+                  <textarea id="aspirasi-message" placeholder="Tulis aspirasi Anda..." rows="4" maxlength="500" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit-aspirasi">
+                  <i class="fas fa-paper-plane"></i> Kirim Aspirasi
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="aspirasi-list-section">
+            <h3>Aspirasi Terbaru</h3>
+            <div class="aspirasi-full-list" id="aspirasi-full-list">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Informasi Page -->
+      <section id="page-informasi" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-info-circle"></i> Informasi Sistem</h1>
+          <p>Transparansi & Akuntabilitas</p>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card-full">
+            <div class="info-icon"><i class="fas fa-lock"></i></div>
+            <h3>Satu Perangkat, Satu Suara</h3>
+            <p>Sistem menandai perangkat Anda dengan <strong>cookie aman</strong> + <strong>fingerprint browser</strong> (sinyal teknis ringan) yang di-hash di server. Pilihan Anda tidak dapat dilacak kembali ke identitas.</p>
+          </div>
+
+          <div class="info-card-full">
+            <div class="info-icon"><i class="fas fa-sync-alt"></i></div>
+            <h3>Refresh & Menutup Browser</h3>
+            <p>Refresh halaman atau menutup browser <strong>tidak membuka hak voting baru</strong>. Menghapus cookie juga tidak menghapus catatan hak pilih di server.</p>
+          </div>
+
+          <div class="info-card-full">
+            <div class="info-icon"><i class="fas fa-mobile-alt"></i></div>
+            <h3>Berbagi Perangkat</h3>
+            <p><strong>Catatan penting:</strong> satu perangkat satu suara ≠ satu orang satu suara. Sistem membatasi perangkat, bukan mengenali individu. Warga yang berbagi HP diharapkan berbagi secara adil.</p>
+          </div>
+
+          <div class="info-card-full highlight">
+            <div class="info-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3>Privasi Dijamin</h3>
+            <p><strong>Nama, NIK, nomor HP, dan alamat IP tidak pernah diminta atau disimpan.</strong> Detail lengkap ada di halaman Transparansi.</p>
+          </div>
+
+          <div class="info-card-full">
+            <div class="info-icon"><i class="fas fa-server"></i></div>
+            <h3>Detail Teknis</h3>
+            <div class="tech-details" id="tech-details"></div>
+          </div>
+
+          <div class="info-card-full">
+            <div class="info-icon"><i class="fas fa-chart-bar"></i></div>
+            <h3>Statistik Sistem</h3>
+            <div class="stats-grid" id="system-stats"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Jadwal Page -->
+      <section id="page-jadwal" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-calendar-alt"></i> Jadwal Tahapan Pemilihan</h1>
+          <p>Timeline lengkap Pilkades 2026</p>
+        </div>
+
+        <div class="timeline-full">
+          <div class="timeline-full-item completed">
+            <div class="timeline-full-dot"><i class="fas fa-check"></i></div>
+            <div class="timeline-full-content">
+              <h3>Publikasi Calon</h3>
+              <span class="timeline-date">01 – 10 November 2026</span>
+              <p>Pendaftaran dan verifikasi calon kepala desa.</p>
+            </div>
+          </div>
+          <div class="timeline-full-item completed">
+            <div class="timeline-full-dot"><i class="fas fa-check"></i></div>
+            <div class="timeline-full-content">
+              <h3>Penyerapan Aspirasi</h3>
+              <span class="timeline-date">11 – 30 November 2026</span>
+              <p>Masa penyerapan aspirasi warga kepada calon.</p>
+            </div>
+          </div>
+          <div class="timeline-full-item current">
+            <div class="timeline-full-dot">3</div>
+            <div class="timeline-full-content">
+              <h3>Debat Publik</h3>
+              <span class="timeline-date">05 Desember 2026</span>
+              <p>Debat terbuka calon di balai desa.</p>
+            </div>
+          </div>
+          <div class="timeline-full-item">
+            <div class="timeline-full-dot">4</div>
+            <div class="timeline-full-content">
+              <h3>Pemungutan Suara</h3>
+              <span class="timeline-date">12 Desember 2026</span>
+              <p>Pemungutan suara dari pukul 07.00 – 13.00 WIB.</p>
+            </div>
+          </div>
+          <div class="timeline-full-item">
+            <div class="timeline-full-dot">5</div>
+            <div class="timeline-full-content">
+              <h3>Pengumuman Hasil</h3>
+              <span class="timeline-date">15 Desember 2026</span>
+              <p>Penghitungan dan pengumuman hasil resmi.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pengaturan Page -->
+      <section id="page-pengaturan" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-cog"></i> Pengaturan</h1>
+          <p>Konfigurasi sistem</p>
+        </div>
+
+        <div class="settings-grid">
+          <div class="settings-card">
+            <div class="settings-icon"><i class="fas fa-language"></i></div>
+            <h3>Bahasa</h3>
+            <p>Bahasa Indonesia</p>
+          </div>
+          <div class="settings-card">
+            <div class="settings-icon"><i class="fas fa-bell"></i></div>
+            <h3>Notifikasi</h3>
+            <p>Aktif - Hasil realtime</p>
+          </div>
+          <div class="settings-card">
+            <div class="settings-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3>Status Verifikasi</h3>
+            <p id="device-status">Perangkat terverifikasi ✓</p>
+          </div>
+          <div class="settings-card">
+            <div class="settings-icon"><i class="fas fa-vote-yea"></i></div>
+            <h3>Status Voting</h3>
+            <p id="voting-status">Belum memberikan suara</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
 
   <!-- Confirmation Modal -->
   <div id="modal" class="modal">
     <div class="modal-content">
-      <h3>Konfirmasi Pilihan</h3>
+      <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+      <h3>Konfirmasi Pilihan Anda</h3>
       <p>Anda yakin memilih <strong>Calon <span id="modal-candidate"></span></strong>?</p>
-      <p class="modal-warning">⚠️ Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
+      <p class="modal-warning"><i class="fas fa-exclamation-circle"></i> Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeModal()">Batal</button>
         <button class="btn-confirm" onclick="confirmVote()">Ya, Saya Yakin</button>
@@ -202,8 +656,33 @@
     </div>
   </div>
 
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toast-message"></span>
+  </div>
+
   <footer class="footer">
-    <p>Pemilihan Kepala Desa &copy; 2026 | Sistem Satu Perangkat Satu Suara</p>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="logo-emblem small"><i class="fas fa-mosque"></i></div>
+        <div>
+          <strong>Portal Demokrasi Desa</strong>
+          <span>Desa Maju Jaya, Kec. Sejahtera</span>
+        </div>
+      </div>
+      <div class="footer-text">
+        <p>Portal ini untuk seluruh warga Desa Maju Jaya</p>
+        <div class="footer-badges">
+          <span><i class="fas fa-check-circle"></i> Transparan</span>
+          <span><i class="fas fa-check-circle"></i> Partisipatif</span>
+          <span><i class="fas fa-check-circle"></i> Demokratis</span>
+        </div>
+      </div>
+      <div class="footer-copy">
+        <p>&copy; 2026 Desa Maju Jaya. Sistem Informasi Pilkades</p>
+      </div>
+    </div>
   </footer>
 
   <script src="/js/app.js"></script>

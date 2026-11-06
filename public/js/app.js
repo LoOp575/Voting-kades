@@ -2,6 +2,10 @@
 let selectedCandidate = null;
 let hasVoted = false;
 let voteChart = null;
+let aspirasiData = [
+  { name: 'Anonim', category: 'saran', message: 'Mohon perbaikan jalan di dusun Sukamaju.', date: '29 Nov 2026' },
+  { name: 'Anonim', category: 'kritik', message: 'Semoga program UMKM desa segera direalisasikan.', date: '28 Nov 2026' }
+];
 
 // ===== Fingerprint =====
 function generateFingerprint() {
@@ -20,7 +24,6 @@ function generateFingerprint() {
   };
   
   const str = JSON.stringify(signals);
-  // Simple hash
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -28,6 +31,14 @@ function generateFingerprint() {
     hash |= 0;
   }
   return Math.abs(hash).toString(36) + '_' + signals.screens + '_' + signals.cores;
+}
+
+// ===== Toast Notification =====
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-message').textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 // ===== API Calls =====
@@ -42,9 +53,16 @@ async function checkVoteStatus() {
     
     if (data.hasVoted) {
       hasVoted = true;
-      document.getElementById('voting-area').style.display = 'none';
-      document.getElementById('voted-notice').style.display = 'block';
-      document.getElementById('voted-candidate').textContent = data.votedFor;
+      const votingArea = document.getElementById('voting-area');
+      const votedNotice = document.getElementById('voted-notice');
+      if (votingArea) votingArea.style.display = 'none';
+      if (votedNotice) votedNotice.style.display = 'block';
+      const votedCandidate = document.getElementById('voted-candidate');
+      if (votedCandidate) votedCandidate.textContent = data.votedFor;
+      
+      // Update settings page
+      const votingStatus = document.getElementById('voting-status');
+      if (votingStatus) votingStatus.textContent = `Sudah memilih Calon ${data.votedFor} ✓`;
     }
   } catch (err) {
     console.error('Error checking status:', err);
@@ -53,8 +71,6 @@ async function checkVoteStatus() {
 
 async function submitVote() {
   if (!selectedCandidate) return;
-  
-  // Show confirmation modal
   document.getElementById('modal-candidate').textContent = selectedCandidate;
   document.getElementById('modal').classList.add('show');
 }
@@ -75,9 +91,13 @@ async function confirmVote() {
     
     if (data.success) {
       hasVoted = true;
-      document.getElementById('voting-area').style.display = 'none';
-      document.getElementById('voted-notice').style.display = 'block';
-      document.getElementById('voted-candidate').textContent = selectedCandidate;
+      const votingArea = document.getElementById('voting-area');
+      const votedNotice = document.getElementById('voted-notice');
+      if (votingArea) votingArea.style.display = 'none';
+      if (votedNotice) votedNotice.style.display = 'block';
+      const votedCandidate = document.getElementById('voted-candidate');
+      if (votedCandidate) votedCandidate.textContent = selectedCandidate;
+      showToast('Suara Anda telah tercatat!');
     } else {
       alert(data.error || 'Terjadi kesalahan');
     }
@@ -97,186 +117,252 @@ function selectCandidate(num) {
   
   selectedCandidate = num;
   
-  // Update UI
-  document.querySelectorAll('.candidate-card').forEach(card => {
+  // Update all candidate cards
+  document.querySelectorAll('.candidate-profile-card, .candidate-full-card').forEach(card => {
     card.classList.remove('selected');
   });
-  document.querySelector(`.candidate-card[data-candidate="${num}"]`).classList.add('selected');
+  document.querySelectorAll(`[data-candidate="${num}"]`).forEach(card => {
+    card.classList.add('selected');
+  });
   
   // Enable vote button
   const btn = document.getElementById('vote-btn');
-  btn.disabled = false;
-  btn.textContent = `Pilih Calon ${num}`;
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fas fa-check-circle"></i> Pilih Calon ${String(num).padStart(2, '0')}`;
+  }
+}
+
+function focusCandidate(num) {
+  setTimeout(() => {
+    const card = document.querySelector(`.candidate-full-card[data-candidate="${num}"]`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      selectCandidate(num);
+    }
+  }, 100);
 }
 
 // ===== Page Navigation =====
 function showPage(page) {
-  // Hide all pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(`page-${page}`).classList.add('active');
+  const targetPage = document.getElementById(`page-${page}`);
+  if (targetPage) targetPage.classList.add('active');
   
-  // Update nav links
-  document.querySelectorAll('.nav-link').forEach(link => {
+  document.querySelectorAll('.sidebar-link').forEach(link => {
     link.classList.remove('active');
     if (link.dataset.page === page) link.classList.add('active');
   });
   
-  // Close mobile menu
-  document.querySelector('.nav-links').classList.remove('show');
+  if (page === 'polling') loadPolling();
+  if (page === 'informasi') loadInfo();
+  if (page === 'aspirasi') loadAspirasi();
   
-  // Load page data
-  if (page === 'results') loadResults();
-  if (page === 'transparency') loadTransparency();
-  
-  // Scroll to top
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function toggleMenu() {
-  document.querySelector('.nav-links').classList.toggle('show');
-}
-
-// ===== Results =====
-async function loadResults() {
+// ===== Polling / Results =====
+async function loadPolling() {
   try {
     const res = await fetch('/api/results');
     const data = await res.json();
-    
-    renderChart(data);
-    renderDetails(data);
+    renderPollingChart(data);
+    renderPollingDetails(data);
   } catch (err) {
-    console.error('Error loading results:', err);
+    console.error('Error loading polling:', err);
   }
 }
 
-function renderChart(data) {
-  const ctx = document.getElementById('voteChart').getContext('2d');
+const candidateInfo = {
+  '1': { name: 'Budi Santoso', color: '#22c55e', num: '01' },
+  '2': { name: 'Siti Rahmawati', color: '#3b82f6', num: '02' },
+  '3': { name: 'Ahmad Fauzi', color: '#f59e0b', num: '03' },
+  '4': { name: 'Dewi Lestari', color: '#8b5cf6', num: '04' }
+};
+
+function renderPollingChart(data) {
+  const ctx = document.getElementById('voteChart');
+  if (!ctx) return;
   
-  const colors = {
-    '1': '#2563eb',
-    '2': '#16a34a',
-    '3': '#dc2626',
-    '4': '#9333ea'
-  };
+  const totalVoters = 1248;
+  const participation = totalVoters > 0 ? ((data.total / totalVoters) * 100).toFixed(1) : 0;
+  document.getElementById('chart-percent').textContent = `${participation}%`;
   
-  const labels = Object.keys(data.candidates).map(k => `Calon ${k}`);
+  const colors = Object.keys(data.candidates).map(k => candidateInfo[k].color);
+  const labels = Object.keys(data.candidates).map(k => `Calon ${candidateInfo[k].num}`);
   const values = Object.values(data.candidates).map(c => c.votes);
-  const bgColors = Object.keys(data.candidates).map(k => colors[k]);
   
   if (voteChart) {
-    voteChart.data.labels = labels;
     voteChart.data.datasets[0].data = values;
-    voteChart.data.datasets[0].backgroundColor = bgColors;
     voteChart.update();
   } else {
     voteChart = new Chart(ctx, {
-      type: 'pie',
+      type: 'doughnut',
       data: {
         labels: labels,
         datasets: [{
           data: values,
-          backgroundColor: bgColors,
+          backgroundColor: colors,
           borderColor: '#fff',
-          borderWidth: 3,
-          hoverBorderWidth: 4,
+          borderWidth: 4,
           hoverOffset: 10
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        cutout: '65%',
         plugins: {
           legend: {
             position: 'bottom',
-            labels: {
-              padding: 20,
-              font: { size: 13, weight: '600' }
-            }
+            labels: { padding: 15, font: { size: 12, weight: '600' }, usePointStyle: true }
           },
           tooltip: {
             callbacks: {
               label: function(context) {
-                const candidate = data.candidates[Object.keys(data.candidates)[context.dataIndex]];
-                return `${context.label}: ${context.raw} suara (${candidate.percentage}%)`;
+                const key = Object.keys(data.candidates)[context.dataIndex];
+                const info = candidateInfo[key];
+                return `${info.name}: ${context.raw} suara (${data.candidates[key].percentage}%)`;
               }
             }
           }
         },
-        animation: {
-          animateScale: true,
-          animateRotate: true
-        }
+        animation: { animateScale: true, animateRotate: true }
       }
     });
   }
 }
 
-function renderDetails(data) {
-  const container = document.getElementById('results-details');
-  const colors = {
-    '1': '#2563eb',
-    '2': '#16a34a',
-    '3': '#dc2626',
-    '4': '#9333ea'
-  };
+function renderPollingDetails(data) {
+  const container = document.getElementById('polling-details');
+  if (!container) return;
   
   let html = '';
   for (const [num, info] of Object.entries(data.candidates)) {
+    const cand = candidateInfo[num];
     html += `
-      <div class="result-item">
-        <div class="result-color" style="background: ${colors[num]};"></div>
-        <div class="result-info">
-          <div class="result-name">Calon ${num}</div>
-          <div class="result-votes">${info.votes} suara</div>
-          <div class="result-bar">
-            <div class="result-bar-fill" style="width: ${info.percentage}%; background: ${colors[num]};"></div>
+      <div class="polling-detail-item" style="border-left-color: ${cand.color};">
+        <div class="polling-detail-header">
+          <div class="polling-detail-name">
+            <span class="polling-detail-num" style="background: ${cand.color};">${cand.num}</span>
+            ${cand.name}
           </div>
+          <div class="polling-detail-percent" style="color: ${cand.color};">${info.percentage}%</div>
         </div>
-        <div class="result-percentage" style="color: ${colors[num]};">${info.percentage}%</div>
+        <div class="polling-detail-votes">${info.votes} suara</div>
+        <div class="polling-bar">
+          <div class="polling-bar-fill" style="width: ${info.percentage}%; background: ${cand.color};"></div>
+        </div>
       </div>
     `;
   }
+  container.innerHTML = html;
   
-  html += `
-    <div class="result-item" style="background: #f7fafc; justify-content: center;">
-      <div class="result-info" style="text-align: center;">
-        <div class="result-votes" style="font-size: 1.1rem; font-weight: 600;">
-          Total Suara: <strong>${data.total}</strong>
+  const totalEl = document.getElementById('polling-total-value');
+  if (totalEl) totalEl.textContent = data.total;
+}
+
+// ===== Aspirasi =====
+function loadAspirasi() {
+  const container = document.getElementById('aspirasi-full-list');
+  if (!container) return;
+  
+  let html = '';
+  aspirasiData.forEach(item => {
+    const tagClass = item.category;
+    const tagLabel = item.category.charAt(0).toUpperCase() + item.category.slice(1);
+    const icon = item.category === 'saran' ? '💡' : item.category === 'kritik' ? '⚠️' : '👍';
+    
+    html += `
+      <div class="aspiration-item">
+        <div class="aspiration-avatar"><i class="fas fa-user"></i></div>
+        <div class="aspiration-content">
+          <p>${item.message}</p>
+          <span class="aspiration-tag ${tagClass}">${icon} ${tagLabel}</span>
+          <span class="aspiration-date">${item.date}</span>
         </div>
       </div>
-    </div>
-  `;
-  
+    `;
+  });
   container.innerHTML = html;
 }
 
-// ===== Transparency =====
-async function loadTransparency() {
+function submitAspirasi(e) {
+  e.preventDefault();
+  const category = document.getElementById('aspirasi-category').value;
+  const message = document.getElementById('aspirasi-message').value;
+  
+  if (!message.trim()) return;
+  
+  const now = new Date();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  
+  aspirasiData.unshift({ name: 'Anonim', category, message, date: dateStr });
+  
+  document.getElementById('aspirasi-message').value = '';
+  document.getElementById('aspirasi-category').value = 'saran';
+  
+  loadAspirasi();
+  showToast('Aspirasi berhasil dikirim!');
+  
+  // Update home aspirasi list
+  updateHomeAspirasi();
+}
+
+function updateHomeAspirasi() {
+  const homeList = document.getElementById('aspiration-list');
+  if (!homeList) return;
+  
+  let html = '';
+  aspirasiData.slice(0, 2).forEach(item => {
+    const tagClass = item.category;
+    const tagLabel = item.category.charAt(0).toUpperCase() + item.category.slice(1);
+    html += `
+      <div class="aspiration-item">
+        <div class="aspiration-avatar"><i class="fas fa-user"></i></div>
+        <div class="aspiration-content">
+          <p>${item.message}</p>
+          <span class="aspiration-tag ${tagClass}">${tagLabel}</span>
+          <span class="aspiration-date">${item.date}</span>
+        </div>
+      </div>
+    `;
+  });
+  homeList.innerHTML = html;
+}
+
+// ===== Info Page =====
+async function loadInfo() {
   try {
     const res = await fetch('/api/transparency');
     const data = await res.json();
     
-    // Tech details
-    document.getElementById('tech-details').innerHTML = `
-      <p><strong>Metode:</strong> ${data.system.method}</p>
-      <p><strong>Hash:</strong> ${data.system.hash}</p>
-      <p><strong>Data Tersimpan:</strong> ${data.system.storedData}</p>
-      <p><strong>Data Pribadi:</strong> ${data.system.personalData}</p>
-    `;
+    const techDetails = document.getElementById('tech-details');
+    if (techDetails) {
+      techDetails.innerHTML = `
+        <p><strong>Metode:</strong> ${data.system.method}</p>
+        <p><strong>Hash:</strong> ${data.system.hash}</p>
+        <p><strong>Data Tersimpan:</strong> ${data.system.storedData}</p>
+        <p><strong>Data Pribadi:</strong> ${data.system.personalData}</p>
+      `;
+    }
     
-    // System stats
-    document.getElementById('system-stats').innerHTML = `
-      <div class="stat-item">
-        <div class="stat-value">${data.totalDevices}</div>
-        <div class="stat-label">Perangkat Terdaftar</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value">${data.totalVotes}</div>
-        <div class="stat-label">Total Suara</div>
-      </div>
-    `;
+    const systemStats = document.getElementById('system-stats');
+    if (systemStats) {
+      systemStats.innerHTML = `
+        <div class="stat-item-full">
+          <div class="stat-value">${data.totalDevices}</div>
+          <div class="stat-label">Perangkat Terdaftar</div>
+        </div>
+        <div class="stat-item-full">
+          <div class="stat-value">${data.totalVotes}</div>
+          <div class="stat-label">Total Suara</div>
+        </div>
+      `;
+    }
   } catch (err) {
-    console.error('Error loading transparency:', err);
+    console.error('Error loading info:', err);
   }
 }
 
@@ -286,13 +372,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Close modal on outside click
-document.getElementById('modal').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('modal')) {
-    closeModal();
-  }
-});
+const modal = document.getElementById('modal');
+if (modal) {
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+}
 
-// Escape key closes modal
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
 });
