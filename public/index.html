@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pemilihan Kepala Desa</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-brand" onclick="showPage('voting')">
+        🗳️ PilKades
+      </a>
+      <div class="nav-links">
+        <a href="#" class="nav-link active" data-page="voting" onclick="showPage('voting')">Voting</a>
+        <a href="#" class="nav-link" data-page="results" onclick="showPage('results')">Hasil</a>
+        <a href="#" class="nav-link" data-page="transparency" onclick="showPage('transparency')">Transparansi</a>
+      </div>
+      <button class="hamburger" onclick="toggleMenu()">☰</button>
+    </div>
+  </nav>
+
+  <!-- Voting Page -->
+  <section id="page-voting" class="page active">
+    <div class="container">
+      <div class="hero">
+        <h1>Pemilihan Kepala Desa</h1>
+        <p class="subtitle">Satu Perangkat, Satu Suara</p>
+        <p class="description">Pilih calon kepala desa terbaik untuk desa kita. Perangkat Anda hanya dapat memberikan satu suara.</p>
+      </div>
+
+      <div id="voting-area">
+        <div class="candidates-grid">
+          <!-- Kandidat 1 -->
+          <div class="candidate-card" data-candidate="1" onclick="selectCandidate(1)">
+            <div class="candidate-number" style="background: #2563eb;">1</div>
+            <div class="candidate-avatar">👤</div>
+            <h3 class="candidate-name">Calon 1</h3>
+            <div class="vision-mission">
+              <h4>Visi:</h4>
+              <p>Terwujudnya desa yang mandiri, sejahtera, dan berakhlak mulia melalui pemberdayaan masyarakat.</p>
+              <h4>Misi:</h4>
+              <ul>
+                <li>Meningkatkan kualitas infrastruktur desa</li>
+                <li>Mengembangkan potensi ekonomi lokal</li>
+                <li>Meningkatkan pelayanan publik yang transparan</li>
+                <li>Melestarikan budaya dan kearifan lokal</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Kandidat 2 -->
+          <div class="candidate-card" data-candidate="2" onclick="selectCandidate(2)">
+            <div class="candidate-number" style="background: #16a34a;">2</div>
+            <div class="candidate-avatar">👤</div>
+            <h3 class="candidate-name">Calon 2</h3>
+            <div class="vision-mission">
+              <h4>Visi:</h4>
+              <p>Membangun desa yang inovatif dan berkelanjutan berbasis teknologi digital.</p>
+              <h4>Misi:</h4>
+              <ul>
+                <li>Digitalisasi layanan pemerintahan desa</li>
+                <li>Pelatihan teknologi untuk pemuda desa</li>
+                <li>Pengembangan wisata berbasis digital</li>
+                <li>Sistem informasi desa yang terbuka</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Kandidat 3 -->
+          <div class="candidate-card" data-candidate="3" onclick="selectCandidate(3)">
+            <div class="candidate-number" style="background: #dc2626;">3</div>
+            <div class="candidate-avatar">👤</div>
+            <h3 class="candidate-name">Calon 3</h3>
+            <div class="vision-mission">
+              <h4>Visi:</h4>
+              <p>Desa yang adil, merata, dan bermartabat dengan semangat gotong royong.</p>
+              <h4>Misi:</h4>
+              <ul>
+                <li>Pemerataan pembangunan di seluruh dusun</li>
+                <li>Penguatan lembaga kemasyarakatan</li>
+                <li>Program bantuan sosial yang tepat sasaran</li>
+                <li>Pemberdayaan perempuan dan anak</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Kandidat 4 -->
+          <div class="candidate-card" data-candidate="4" onclick="selectCandidate(4)">
+            <div class="candidate-number" style="background: #9333ea;">4</div>
+            <div class="candidate-avatar">👤</div>
+            <h3 class="candidate-name">Calon 4</h3>
+            <div class="vision-mission">
+              <h4>Visi:</h4>
+              <p>Desa hijau, lestari, dan produktif menuju ketahanan pangan lokal.</p>
+              <h4>Misi:</h4>
+              <ul>
+                <li>Program pertanian organik dan perikanan</li>
+                <li>Penghijauan dan konservasi lingkungan</li>
+                <li>Pengelolaan sampah dan energi terbarukan</li>
+                <li>Pasar desa untuk produk lokal</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="vote-button-container">
+          <button id="vote-btn" class="btn-vote" onclick="submitVote()" disabled>
+            Pilih Kandidat di Atas
+          </button>
+        </div>
+      </div>
+
+      <div id="voted-notice" class="voted-notice" style="display: none;">
+        <div class="notice-icon">✅</div>
+        <h2>Terima Kasih!</h2>
+        <p>Suara Anda telah tercatat untuk <strong>Calon <span id="voted-candidate"></span></strong>.</p>
+        <p class="notice-sub">Perangkat ini sudah menggunakan hak suaranya.</p>
+        <button class="btn-secondary" onclick="showPage('results')">Lihat Hasil Voting</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results Page -->
+  <section id="page-results" class="page">
+    <div class="container">
+      <div class="hero">
+        <h1>Hasil Perolehan Suara</h1>
+        <p class="subtitle">Real-time Count</p>
+      </div>
+
+      <div class="results-container">
+        <div class="chart-wrapper">
+          <canvas id="voteChart"></canvas>
+        </div>
+        <div class="results-details" id="results-details">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transparency Page -->
+  <section id="page-transparency" class="page">
+    <div class="container">
+      <div class="hero">
+        <h1>Transparansi Sistem</h1>
+        <p class="subtitle">Kejelasan & Akuntabilitas</p>
+      </div>
+
+      <div class="transparency-content">
+        <div class="info-card">
+          <h3>🔒 Satu Perangkat, Satu Suara</h3>
+          <p>Sistem menandai perangkat Anda dengan <strong>cookie aman</strong> + <strong>fingerprint browser</strong> (sinyal teknis ringan) yang di-hash di server. Pilihan Anda tidak dapat dilacak kembali ke identitas.</p>
+        </div>
+
+        <div class="info-card">
+          <h3>🔄 Refresh & Menutup Browser</h3>
+          <p>Refresh halaman atau menutup browser <strong>tidak membuka hak voting baru</strong>. Menghapus cookie juga tidak menghapus catatan hak pilih di server.</p>
+        </div>
+
+        <div class="info-card">
+          <h3>📱 Berbagi Perangkat</h3>
+          <p><strong>Catatan penting:</strong> satu perangkat satu suara ≠ satu orang satu suara. Sistem membatasi perangkat, bukan mengenali individu. Warga yang berbagi HP diharapkan berbagi secara adil.</p>
+        </div>
+
+        <div class="info-card">
+          <h3>🛡️ Privasi Dijamin</h3>
+          <p><strong>Nama, NIK, nomor HP, dan alamat IP tidak pernah diminta atau disimpan.</strong></p>
+        </div>
+
+        <div class="info-card">
+          <h3>📊 Detail Teknis</h3>
+          <div class="tech-details" id="tech-details">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+        <div class="info-card">
+          <h3>📈 Statistik Sistem</h3>
+          <div class="stats" id="system-stats">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Confirmation Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h3>Konfirmasi Pilihan</h3>
+      <p>Anda yakin memilih <strong>Calon <span id="modal-candidate"></span></strong>?</p>
+      <p class="modal-warning">⚠️ Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeModal()">Batal</button>
+        <button class="btn-confirm" onclick="confirmVote()">Ya, Saya Yakin</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Pemilihan Kepala Desa &copy; 2026 | Sistem Satu Perangkat Satu Suara</p>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
