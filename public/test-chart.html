@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><title>Chart Test</title></head>
+<body>
+  <h1>Chart.js Test</h1>
+  <script src="/js/chart.min.js"></script>
+  <canvas id="testChart" width="400" height="400"></canvas>
+  <div id="status">Testing...</div>
+  <script>
+    document.getElementById('status').textContent = 'Chart type: ' + typeof Chart;
+    if (typeof Chart !== 'undefined') {
+      new Chart(document.getElementById('testChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Calon 1', 'Calon 2', 'Calon 3', 'Calon 4'],
+          datasets: [{
+            data: [286, 256, 214, 136],
+            backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6'],
+            borderColor: '#fff',
+            borderWidth: 3
+          }]
+        }
+      });
+      document.getElementById('status').textContent = '✅ Chart.js loaded and rendered!';
+    } else {
+      document.getElementById('status').textContent = '❌ Chart.js NOT loaded!';
+    }
+  </script>
+</body>
+</html>
