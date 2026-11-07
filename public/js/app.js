@@ -22,6 +22,7 @@ function generateFingerprint() {
 
 function showToast(msg) {
   const t = document.getElementById('toast');
+  if (!t) return;
   document.getElementById('toast-msg').textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
@@ -37,30 +38,44 @@ async function checkVoteStatus() {
     const data = await res.json();
     if (data.hasVoted) {
       hasVoted = true;
-      const va = document.getElementById('voting-area');
-      // Hide candidates and vote button
-      document.querySelectorAll('.candidate-card').forEach(c => c.style.pointerEvents = 'none');
-      document.getElementById('vote-btn').style.display = 'none';
-      document.getElementById('voted-notice').style.display = 'block';
-      document.getElementById('voted-candidate').textContent = data.votedFor;
+      document.querySelectorAll('.candidate-card').forEach(c => {
+        c.style.pointerEvents = 'none';
+        c.style.opacity = '0.7';
+      });
+      const btn = document.getElementById('vote-btn');
+      if (btn) btn.style.display = 'none';
+      const notice = document.getElementById('voted-notice');
+      if (notice) notice.style.display = 'block';
+      const vc = document.getElementById('voted-candidate');
+      if (vc) vc.textContent = data.votedFor;
     }
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error('Check status error:', e);
+  }
 }
 
 function selectCandidate(num) {
   if (hasVoted) return;
   selectedCandidate = num;
   document.querySelectorAll('.candidate-card').forEach(c => c.classList.remove('selected'));
-  document.querySelector(`[data-candidate="${num}"]`).classList.add('selected');
+  const card = document.querySelector(`[data-candidate="${num}"]`);
+  if (card) card.classList.add('selected');
   const btn = document.getElementById('vote-btn');
-  btn.disabled = false;
-  btn.innerHTML = '<i class="fas fa-check-circle"></i> Pilih Calon ' + String(num).padStart(2, '0');
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = '✅ Pilih Calon ' + String(num).padStart(2, '0');
+  }
 }
 
 function submitVote() {
-  if (!selectedCandidate) return;
-  document.getElementById('modal-candidate').textContent = selectedCandidate;
-  document.getElementById('modal').classList.add('show');
+  if (!selectedCandidate) {
+    showToast('Pilih kandidat terlebih dahulu!');
+    return;
+  }
+  const mc = document.getElementById('modal-candidate');
+  if (mc) mc.textContent = selectedCandidate;
+  const modal = document.getElementById('modal');
+  if (modal) modal.classList.add('show');
 }
 
 async function confirmVote() {
@@ -77,30 +92,41 @@ async function confirmVote() {
     const data = await res.json();
     if (data.success) {
       hasVoted = true;
-      document.querySelectorAll('.candidate-card').forEach(c => c.style.pointerEvents = 'none');
-      document.getElementById('vote-btn').style.display = 'none';
-      document.getElementById('voted-notice').style.display = 'block';
-      document.getElementById('voted-candidate').textContent = selectedCandidate;
+      document.querySelectorAll('.candidate-card').forEach(c => {
+        c.style.pointerEvents = 'none';
+        c.style.opacity = '0.7';
+      });
+      const btn = document.getElementById('vote-btn');
+      if (btn) btn.style.display = 'none';
+      const notice = document.getElementById('voted-notice');
+      if (notice) notice.style.display = 'block';
+      const vc = document.getElementById('voted-candidate');
+      if (vc) vc.textContent = selectedCandidate;
       showToast('Suara Anda telah tercatat!');
-      loadPolling();
+      // Reload polling data
+      await loadPolling();
     } else {
       alert(data.error || 'Terjadi kesalahan');
     }
   } catch (e) {
-    alert('Gagal mengirim suara.');
+    alert('Gagal mengirim suara. Silakan coba lagi.');
+    console.error('Vote error:', e);
   }
 }
 
 function closeModal() {
-  document.getElementById('modal').classList.remove('show');
+  const m = document.getElementById('modal');
+  if (m) m.classList.remove('show');
 }
 
 function showAspirasiModal() {
-  document.getElementById('aspirasi-modal').classList.add('show');
+  const m = document.getElementById('aspirasi-modal');
+  if (m) m.classList.add('show');
 }
 
 function closeAspirasiModal() {
-  document.getElementById('aspirasi-modal').classList.remove('show');
+  const m = document.getElementById('aspirasi-modal');
+  if (m) m.classList.remove('show');
 }
 
 async function submitAspirasi() {
@@ -121,7 +147,8 @@ async function submitAspirasi() {
       closeAspirasiModal();
       document.getElementById('asp-message').value = '';
       showToast('Aspirasi berhasil dikirim!');
-      loadPolling();
+    } else {
+      alert(data.error || 'Gagal mengirim aspirasi.');
     }
   } catch (e) {
     alert('Gagal mengirim aspirasi.');
@@ -138,29 +165,51 @@ const candidateInfo = {
 async function loadPolling() {
   try {
     const res = await fetch('/api/results');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     renderChart(data);
     renderPollingList(data);
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error('Load polling error:', e);
+  }
 }
 
 function renderChart(data) {
   const totalVoters = 1248;
   const pct = ((data.total / totalVoters) * 100).toFixed(1);
-  document.getElementById('chart-percent').textContent = pct + '%';
-  document.getElementById('polling-total').textContent = data.total;
-  document.getElementById('stat-votes').textContent = data.total;
-  document.getElementById('stat-progress').style.width = pct + '%';
-  document.getElementById('stat-participation').textContent = '(' + pct.replace('.', ',') + '%)';
+
+  const el1 = document.getElementById('chart-percent');
+  if (el1) el1.textContent = pct.replace('.', ',') + '%';
+
+  const el2 = document.getElementById('polling-total');
+  if (el2) el2.textContent = data.total;
+
+  const el3 = document.getElementById('stat-votes');
+  if (el3) el3.textContent = data.total;
+
+  const el4 = document.getElementById('stat-progress');
+  if (el4) el4.style.width = pct + '%';
+
+  const el5 = document.getElementById('stat-participation');
+  if (el5) el5.textContent = '(' + pct.replace('.', ',') + '%)';
 
   const ctx = document.getElementById('voteChart');
+  if (!ctx) { console.error('voteChart canvas not found'); return; }
+
   const colors = Object.keys(data.candidates).map(k => candidateInfo[k].color);
   const labels = Object.keys(data.candidates).map(k => 'Calon ' + candidateInfo[k].num);
   const values = Object.values(data.candidates).map(c => c.votes);
 
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js not loaded!');
+    return;
+  }
+
   if (voteChart) {
+    voteChart.data.labels = labels;
     voteChart.data.datasets[0].data = values;
-    voteChart.update();
+    voteChart.data.datasets[0].backgroundColor = colors;
+    voteChart.update('active');
   } else {
     voteChart = new Chart(ctx, {
       type: 'doughnut',
@@ -176,15 +225,16 @@ function renderChart(data) {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: true,
         cutout: '62%',
         plugins: {
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: ctx => {
-                const k = Object.keys(data.candidates)[ctx.dataIndex];
+              label: ctx2 => {
+                const k = Object.keys(data.candidates)[ctx2.dataIndex];
                 const info = candidateInfo[k];
-                return info.name + ': ' + ctx.raw + ' suara (' + data.candidates[k].percentage + '%)';
+                return info.name + ': ' + ctx2.raw + ' suara (' + data.candidates[k].percentage + '%)';
               }
             }
           }
@@ -197,36 +247,45 @@ function renderChart(data) {
 
 function renderPollingList(data) {
   const container = document.getElementById('polling-list');
+  if (!container) return;
   let html = '';
   for (const [num, info] of Object.entries(data.candidates)) {
     const c = candidateInfo[num];
-    html += `
-      <div>
-        <div class="polling-item">
-          <div class="polling-dot" style="background:${c.color}"></div>
-          <div class="polling-name">${c.name}</div>
-          <div class="polling-votes">${info.votes} suara</div>
-          <div class="polling-pct" style="color:${c.color}">${info.percentage}%</div>
-        </div>
-        <div class="polling-bar"><div class="polling-bar-fill" style="width:${info.percentage}%;background:${c.color}"></div></div>
-      </div>`;
+    html += '<div>' +
+      '<div class="polling-item">' +
+        '<div class="polling-dot" style="background:' + c.color + '"></div>' +
+        '<div class="polling-name">' + c.name + '</div>' +
+        '<div class="polling-votes">' + info.votes + ' suara</div>' +
+        '<div class="polling-pct" style="color:' + c.color + '">' + info.percentage + '%</div>' +
+      '</div>' +
+      '<div class="polling-bar"><div class="polling-bar-fill" style="width:' + info.percentage + '%;background:' + c.color + '"></div></div>' +
+    '</div>';
   }
   container.innerHTML = html;
 }
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('App initialized, Chart available:', typeof Chart !== 'undefined');
   checkVoteStatus();
   loadPolling();
 });
 
-// Modal close on outside click
-document.getElementById('modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal')) closeModal();
-});
-document.getElementById('aspirasi-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('aspirasi-modal')) closeAspirasiModal();
-});
+// Modal close handlers
+const voteModal = document.getElementById('modal');
+if (voteModal) {
+  voteModal.addEventListener('click', e => {
+    if (e.target === voteModal) closeModal();
+  });
+}
+
+const aspModal = document.getElementById('aspirasi-modal');
+if (aspModal) {
+  aspModal.addEventListener('click', e => {
+    if (e.target === aspModal) closeAspirasiModal();
+  });
+}
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); closeAspirasiModal(); }
 });
