@@ -86,6 +86,9 @@ app.post('/api/check', (req, res) => {
   res.json({ hasVoted, votedFor: devices[deviceId] || null });
 });
 
+// File lock untuk mencegah race condition
+let voteLock = null;
+
 // Submit vote
 app.post('/api/vote', (req, res) => {
   const { candidate } = req.body;
@@ -94,44 +97,60 @@ app.post('/api/vote', (req, res) => {
     return res.status(400).json({ error: 'Kandidat tidak valid' });
   }
   
-  const devices = loadDevices();
-  const deviceId = getDeviceId(req);
-  
-  if (devices[deviceId] !== undefined) {
-    return res.status(403).json({ 
-      error: 'Perangkat ini sudah menggunakan hak suara',
-      votedFor: devices[deviceId]
-    });
+  // Jika ada vote lain sedang diproses, tolak sementara
+  if (voteLock) {
+    return res.status(429).json({ error: 'Mohon tunggu sebentar, coba lagi.' });
   }
   
-  const deviceCookie = crypto.randomBytes(16).toString('hex');
-  res.cookie('_voting_device', deviceCookie, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 365 * 24 * 60 * 60 * 1000,
-    path: '/'
-  });
+  voteLock = true;
   
-  const fingerprint = req.body.fingerprint || '';
-  const raw = `${deviceCookie}|${fingerprint}`;
-  const newDeviceId = crypto
-    .createHash('sha256')
-    .update(raw + FINGERPRINT_SECRET)
-    .digest('hex');
-  
-  const votes = loadVotes();
-  votes[candidate] = (votes[candidate] || 0) + 1;
-  saveVotes(votes);
-  
-  devices[newDeviceId] = candidate;
-  saveDevices(devices);
-  
-  res.json({ 
-    success: true, 
-    message: 'Terima kasih! Suara Anda telah tercatat.',
-    votedFor: candidate
-  });
+  try {
+    const devices = loadDevices();
+    const deviceId = getDeviceId(req);
+    
+    if (devices[deviceId] !== undefined) {
+      voteLock = null;
+      return res.status(403).json({ 
+        error: 'Perangkat ini sudah menggunakan hak suara',
+        votedFor: devices[deviceId]
+      });
+    }
+    
+    const deviceCookie = crypto.randomBytes(16).toString('hex');
+    res.cookie('_voting_device', deviceCookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      path: '/'
+    });
+    
+    const fingerprint = req.body.fingerprint || '';
+    const raw = `${deviceCookie}|${fingerprint}`;
+    const newDeviceId = crypto
+      .createHash('sha256')
+      .update(raw + FINGERPRINT_SECRET)
+      .digest('hex');
+    
+    const votes = loadVotes();
+    votes[candidate] = (votes[candidate] || 0) + 1;
+    saveVotes(votes);
+    
+    devices[newDeviceId] = candidate;
+    saveDevices(devices);
+    
+    voteLock = null;
+    
+    res.json({ 
+      success: true, 
+      message: 'Terima kasih! Suara Anda telah tercatat.',
+      votedFor: candidate
+    });
+  } catch (err) {
+    voteLock = null;
+    console.error('Vote error:', err);
+    res.status(500).json({ error: 'Terjadi kesalahan server.' });
+  }
 });
 
 // Get hasil voting
